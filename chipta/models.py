@@ -1,7 +1,14 @@
 from random import randint
-from django.db import models
 
-# Create your models here.
+from django.db import models
+from django.db import models
+from django.contrib.auth.models import AbstractUser, User
+
+# class MyUser(AbstractUser):
+#     image_field = ...
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
 
 class Chipta(models.Model):
@@ -39,3 +46,9 @@ class Band_qilish(models.Model):
 
     class Meta:
         verbose_name_plural = "Band_qilishlar"
+
+
+@receiver(post_save, sender=User)
+def create_token(sender, instance, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)

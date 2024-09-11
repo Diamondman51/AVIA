@@ -9,7 +9,8 @@ faker = Faker()
 
 
 class ChiptaAdmin(admin.ModelAdmin):
-    date_time_ = faker.date_time()
+    f_date_time_ = faker.date_time()
+    date_time_ = datetime.datetime(f_date_time_.year, f_date_time_.month, f_date_time_.day, f_date_time_.hour, f_date_time_.minute)
     arrival_time = date_time_ + datetime.timedelta(days=2)
 
     def get_changeform_initial_data(self, request: HttpRequest) -> dict[str, str]:
@@ -21,6 +22,10 @@ class ChiptaAdmin(admin.ModelAdmin):
                 "qaysi_shahardan": faker.city(),
                 "soni": 47
                 }
+
+    def save_model(self, request, obj, form, change):
+        return super().save_model(request, obj, form, change)
+
     list_display = ['id', 'raqam', 'kompaniya', 'ketish_vaqti', 'kelish_vaqti', 'qaysi_shaharga', 'qaysi_shahardan', 'soni']
     ordering = ['id', 'kompaniya', 'ketish_vaqti', 'kelish_vaqti', 'qaysi_shaharga', 'qaysi_shahardan']
     list_editable = ['kompaniya', 'ketish_vaqti', 'kelish_vaqti', 'qaysi_shaharga', 'qaysi_shahardan']
@@ -42,6 +47,12 @@ class YolovchiAdmin(admin.ModelAdmin):
     # list_display_links = ['ismi', 'sharifi', 'email', 'telefon']
 
 
+class Band_qilishAdmin(admin.ModelAdmin):
+    list_display = ['id', 'yolovchi', 'chipta']
+    list_display_links = ['id', 'yolovchi', 'chipta']
+    ordering = ['id', 'yolovchi', 'chipta']
+
+
 admin.site.register(Chipta, ChiptaAdmin)
 admin.site.register(Yolovchi, YolovchiAdmin)
-admin.site.register(Band_qilish)
+admin.site.register(Band_qilish, Band_qilishAdmin)
