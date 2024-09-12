@@ -43,13 +43,13 @@ class Band_qilishViewset(ModelViewSet):
         print('list, get', request.GET)
         return super().list(request, *args, **kwargs)
 
-    def create(self, request, *args, **kwargs):
-        # For GET requests, use query_params instead of request.data
-        print('----------------------------------------------------********************')
-        print('params', request.query_params)  # This will print the query parameters
-        print('data', request.data)  # This will print the query parameters
-        print('----------------------------------------------------********************')
-        return super().create(request, *args, **kwargs)
+    # def create(self, request, *args, **kwargs):
+    #     # For GET requests, use query_params instead of request.data
+    #     print('----------------------------------------------------********************')
+    #     print('params', request.query_params)  # This will print the query parameters
+    #     print('data', request.data)  # This will print the query parameters
+    #     print('----------------------------------------------------********************')
+    #     return super().create(request, *args, **kwargs)
 
 
 @api_view(["POST"])

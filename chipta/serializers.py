@@ -1,7 +1,4 @@
-from dataclasses import fields
-from pyexpat import model
-
-from django.contrib.auth import get_user_model
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from chipta.models import *
@@ -11,6 +8,12 @@ class ChiptaSerializer(ModelSerializer):
     class Meta:
         model = Chipta
         fields = "__all__"
+
+    def validate_raqam(self, value):
+        print(type(value))
+        if len(str(value)) != 10:
+            raise serializers.ValidationError('Chipta raqami mos emas!!!')
+        return value
 
 
 class YolovchiSerializer(ModelSerializer):
@@ -40,21 +43,24 @@ class Band_qilishSerializer(ModelSerializer):
         fields = ["yolovchi", 'chipta']
 
     def create(self, validated_data):
-        # Extract nested data for chipta and yolovchi
         print('***********----------------')
         print(validated_data)
         print('***********----------------')
         chipta_data = validated_data.pop('chipta')
         yolovchi_data = validated_data.pop('yolovchi')
 
-        # Retrieve or create Chipta instance based on 'raqam'
         chipta = Chipta.objects.get(raqam=chipta_data['raqam'])
 
-        # Retrieve or create Yolovchi instance based on 'ismi'
         yolovchi = Yolovchi.objects.get(ismi=yolovchi_data['ismi'])
 
-        # Create Band_qilish instance with the related objects
-        band_qilish = Band_qilish.objects.create(chipta=chipta, yolovchi=yolovchi)
+        if chipta.soni > 0:
+            band_qilish = Band_qilish.objects.create(chipta=chipta, yolovchi=yolovchi)
+            chipta.soni -= 1
+            chipta.save()
+        else:
+            chipta.delete()
+            raise serializers.ValidationError('Bilet tugagan')
+
         return band_qilish
 
     # def validate_raqam(self, attrs):

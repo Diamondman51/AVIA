@@ -3,6 +3,8 @@ import random
 import datetime
 from faker import Faker
 from django.http import HttpRequest
+from rest_framework import serializers
+
 from chipta.models import *
 # Register your models here.
 faker = Faker()
@@ -51,6 +53,16 @@ class Band_qilishAdmin(admin.ModelAdmin):
     list_display = ['id', 'yolovchi', 'chipta']
     list_display_links = ['id', 'yolovchi', 'chipta']
     ordering = ['id', 'yolovchi', 'chipta']
+
+    def save_model(self, request, obj, form, change):
+        if obj.chipta.soni > 0:
+            # chipta = Chipta.objects.get(raqam=obj.chipta.raqam)
+            obj.chipta.soni -= 1
+            obj.chipta.save()
+        else:
+            obj.chipta.delete()
+            raise serializers.ValidationError('Bilet tugagan')
+        return super().save_model(request, obj, form, change)
 
 
 admin.site.register(Chipta, ChiptaAdmin)

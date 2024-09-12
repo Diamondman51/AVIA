@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 
 
 class Chipta(models.Model):
-    raqam = models.PositiveBigIntegerField(unique=True, null=False)
+    raqam = models.IntegerField(null=False, unique=True)
     kompaniya = models.CharField(max_length=200, null=False, blank=False)
     ketish_vaqti = models.DateTimeField()
     kelish_vaqti = models.DateTimeField()
