@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yq+@j6ph2_2x&$r*w+y9az$8_&8ttr$*x_h9-45x^e1r-b%9@9'
+SECRET_KEY = 'django-insecure-q*yp(5nokhe)jr@7cmuaoia*7%-%x5$h4^@9))%b!*v+_@q*&('
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,9 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'chipta',
-    'rest_framework.authtoken'
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -108,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Tashkent'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -126,5 +126,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    "PAGE_SIZE": 3
+    "DEFAULT_PAGINATION_CLASS": 'rest_framework.pagination.PageNumberPagination',
+    "PAGE_SIZE": 2
 }

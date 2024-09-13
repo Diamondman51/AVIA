@@ -20,9 +20,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# import datetime
-#
-# d = datetime.datetime(2024, 9, 11, 16, 27)
-# print(datetime.datetime(d.year, d.month, d.day, d.hour, d.minute))

@@ -1,64 +1,52 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import render
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.pagination import PageNumberPagination
-
-from chipta.models import Chipta, Yolovchi, Band_qilish
-from chipta.serializers import ChiptaSerializer, YolovchiSerializer, Band_qilishSerializer
-
 
 # Create your views here.
+from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
+from chipta.models import Chipta, Yolovchi, Band_qilish
+from chipta.serializers import ChiptaSer, YolovchiSer, Band_qilishSer
 
 
 class ChiptaViewset(ModelViewSet):
     queryset = Chipta.objects.all()
-    serializer_class = ChiptaSerializer
+    serializer_class = ChiptaSer
     pagination_class = PageNumberPagination
 
 
 class YolovchiViewset(ModelViewSet):
     queryset = Yolovchi.objects.all()
-    serializer_class = YolovchiSerializer
+    serializer_class = YolovchiSer
     pagination_class = PageNumberPagination
 
 
-class Band_qilishViewset(ModelViewSet):
+class BandQilishViewset(ModelViewSet):
     queryset = Band_qilish.objects.all()
-    serializer_class = Band_qilishSerializer
+    serializer_class = Band_qilishSer
     pagination_class = PageNumberPagination
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_session_key(self):
-        ...
-
-    def list(self, request, *args, **kwargs):
-        print('list, data', request.data)
-        print('list, params', request.query_params)
-        print('list, get', request.GET)
-        return super().list(request, *args, **kwargs)
-
-    # def create(self, request, *args, **kwargs):
-    #     # For GET requests, use query_params instead of request.data
-    #     print('----------------------------------------------------********************')
-    #     print('params', request.query_params)  # This will print the query parameters
-    #     print('data', request.data)  # This will print the query parameters
-    #     print('----------------------------------------------------********************')
-    #     return super().create(request, *args, **kwargs)
 
 
-@api_view(["POST"])
-def post(request):
+@api_view(['POST'])
+def chipta(request):
+    # if request.method == 'POST':
+    req = None
     qayerdan = request.query_params.get('qayerdan')
     qayerga = request.query_params.get('qayerga')
     sanasi = request.query_params.get('sanasi')
+    dict_ = {}
+    if qayerdan:
+        dict_['qaysi_shahardan'] = qayerdan
+    if qayerga:
+        dict_['qaysi_shaharga'] = qayerga
+    if sanasi:
+        dict_['ketish_vaqti'] = sanasi
 
-    chipta = Chipta.objects.get(qaysi_shahardan=qayerdan, qaysi_shaharga=qayerga, ketish_vaqti=sanasi)
-
-    ser = ChiptaSerializer(chipta)
+    if dict_:
+        print(dict_)
+        data = Chipta.objects.filter(**dict_)
+    else:
+        data = Chipta.objects.all()
+    ser = ChiptaSer(data, many=True)
     return Response(ser.data)

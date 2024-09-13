@@ -1,73 +1,74 @@
+import pprint
+
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
-
-from chipta.models import *
+from chipta.models import Chipta, Yolovchi, Band_qilish
 
 
-class ChiptaSerializer(ModelSerializer):
+class ChiptaSer(serializers.ModelSerializer):
     class Meta:
         model = Chipta
-        fields = "__all__"
+        fields = ["raqam", 'kompaniya', 'qaysi_shaharga', 'qaysi_shahardan']
+        # extra_kwargs = {
+        #     'raqam': {'validators': []},  # Disable the unique validation
+        # }
 
-    def validate_raqam(self, value):
-        print(type(value))
-        if len(str(value)) != 10:
-            raise serializers.ValidationError('Chipta raqami mos emas!!!')
-        return value
+    # Instead of creating, we just validate the raqam
+    def to_internal_value(self, data):
+        try:
+            print(999999999999999999999999999999999)
+            print(data)
+            d = {key: value for key, value in data.items()}
+            pprint.pprint(d)
+            print()
+            # chipta = Chipta.objects.get(**{key: value for key, value in data.items()})
+            chipta = Chipta.objects.get(raqam=data.get('raqam'))
+            return chipta
+        except Chipta.DoesNotExist:
+            raise serializers.ValidationError({'raqam': f'Chipta with this raqam does not exist: {data.get("raqam")}'})
 
 
-class YolovchiSerializer(ModelSerializer):
+class YolovchiSer(serializers.ModelSerializer):
     class Meta:
         model = Yolovchi
         fields = "__all__"
 
+    def to_internal_value(self, data):
+        try:
+            # Try to get the existing Yolovchi by ismi
+            # print(777777777777777777777777777777777777)
+            print(data)
+            yolovchi = Yolovchi.objects.get(**{key: value for key, value in data.items()})
+            return yolovchi
+        except Yolovchi.DoesNotExist:
+            # Print the data for debugging
 
-class ChiptaSerializer2(ModelSerializer):
-    class Meta:
-        model = Chipta
-        fields = ["raqam"]
+            print(data)
+            # Create a new Yolovchi using the data passed
+            yolovchi = Yolovchi.objects.create(**{key: value for key, value in data.items()})
+            print(5555555555555555555555555)
+            print(yolovchi)
+            return yolovchi
+
+            # raise serializers.ValidationError({'ismi': 'Yolovchi with this ismi does not exist.'})
 
 
-class YolovchiSerializer2(ModelSerializer):
-    class Meta:
-        model = Yolovchi
-        fields = ["ismi"]
-
-
-class Band_qilishSerializer(ModelSerializer):
-    yolovchi = YolovchiSerializer2()
-    chipta = ChiptaSerializer2()
+class Band_qilishSer(serializers.ModelSerializer):
+    yolovchi = YolovchiSer()
+    chipta = ChiptaSer()
 
     class Meta:
         model = Band_qilish
-        fields = ["yolovchi", 'chipta']
+        fields = ['id', 'chipta', 'yolovchi']
 
     def create(self, validated_data):
-        print('***********----------------')
         print(validated_data)
-        print('***********----------------')
-        chipta_data = validated_data.pop('chipta')
-        yolovchi_data = validated_data.pop('yolovchi')
+        # Fetch existing Chipta
+        chipta = validated_data.get('chipta') # this is object
 
-        chipta = Chipta.objects.get(raqam=chipta_data['raqam'])
-
-        yolovchi = Yolovchi.objects.get(ismi=yolovchi_data['ismi'])
-
-        if chipta.soni > 0:
-            band_qilish = Band_qilish.objects.create(chipta=chipta, yolovchi=yolovchi)
-            chipta.soni -= 1
-            chipta.save()
-        else:
-            chipta.delete()
-            raise serializers.ValidationError('Bilet tugagan')
-
-        return band_qilish
-
-    # def validate_raqam(self, attrs):
-    #     ...
-
-    # def list(self, request, *args, **kwargs):
-    #     # For GET requests, use query_params instead of request.data
-    #     print(request.data)  # This will print the query parameters
-    #     return super().list(request, *args, **kwargs)
-
+        # Fetch or create Yolovchi (depending on your requirements)
+        # yolovchi = validated_data.get('yolovchi')
+        # Create Band_qilish instance
+        band = Band_qilish.objects.create(**validated_data)
+        chipta.is_reserved = True
+        chipta.save()
+        return band
